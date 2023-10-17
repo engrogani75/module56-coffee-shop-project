@@ -41,6 +41,30 @@ async function run() {
      res.send(result)
     })
 
+    app.put('/coffee/:id', async(req, res) =>{
+      const id = req.params(id)
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true };
+     const updatecoffee = req.body;
+      const coffee = {
+        $set: {
+          name: updatecoffee.name,
+          quantity: updatecoffee.quantity,
+          supplier: updatecoffee.supplier,
+          taste: updatecoffee.taste,
+          category: updatecoffee.category,
+          details: updatecoffee.details,
+          photo:  updatecoffee.photo,
+        }
+         
+        
+      }
+
+      const result = await coffee.updateone(filter, coffee, options);
+    console.log(result);
+      res.send(result)
+    })
+
 
     app.get('/coffee', async(req,res) =>{
       const cursor = coffee.find();
