@@ -1,6 +1,6 @@
 const express = require('express')
 const cors =  require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000
@@ -29,9 +29,39 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const coffeeCollection = client.db('coffeeDB');
+    const coffee = coffeeCollection.collection('coffee')
+  
+
     app.post('/coffee', async(req, res) =>{
       const newCoffee = req.body;
       console.log(newCoffee);
+      const result = await coffee.insertOne(newCoffee)
+      console.log(result);
+     res.send(result)
+    })
+
+
+    app.get('/coffee', async(req,res) =>{
+      const cursor = coffee.find();
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
+
+    app.get('/coffee/:id', async(req, res) =>{
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await coffee.findOne(query)
+      res.send(result)
+    })
+
+
+    app.delete('/coffee/:id', async(req, res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await coffee.deleteOne(query)
+      res.send(result)
     })
 
 
@@ -40,7 +70,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
